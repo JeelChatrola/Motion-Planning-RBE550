@@ -108,20 +108,20 @@ def heuristic_custom(node):
 
 if __name__ == "__main__":
     # Load the map
-    # grid, start, goal = load_map('maps/map.csv')
+    grid, start, goal = load_map('maps/map.csv')
     # grid, start, goal = load_map('maps/test_map.csv')
     # grid, start, goal = load_map('maps/test_better.csv')
-    grid, start, goal = load_map('maps/large_map.csv')
+    # grid, start, goal = load_map('maps/large_map.csv')
 
     # Search
-    # bfs_path, bfs_steps = bfs(grid, start, goal)
-    # dfs_path, dfs_steps = dfs(grid, start, goal)
+    bfs_path, bfs_steps = bfs(grid, start, goal)
+    dfs_path, dfs_steps = dfs(grid, start, goal)
     astar_path, astar_steps = astar(grid, start, goal,heuristic)
     # astar_path_1, astar_steps_1 = astar(grid, start, goal,heuristic_custom)
 
     # Show result
-    # draw_path(grid, bfs_path, 'BFS')
-    # draw_path(grid, dfs_path, 'DFS')
+    draw_path(grid, bfs_path, 'BFS')
+    draw_path(grid, dfs_path, 'DFS')
     draw_path(grid, astar_path, 'A*')
     # draw_path(grid, astar_path_1, 'A* Custom')
 

@@ -1,0 +1,224 @@
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.animation import FuncAnimation
+import os
+import sys
+
+import env
+
+class Plotting:
+    def __init__(self, x_start, x_goal):
+        self.xI, self.xG = x_start, x_goal
+        self.env = env.Env()
+        self.obs_bound = self.env.obs_boundary
+        self.obs_circle = self.env.obs_circle
+        self.obs_rectangle = self.env.obs_rectangle
+        self.goal_rectangle = self.env.goal_rectangle
+
+    def animation(self, nodelist, path, name, animation=True):
+        self.plot_grid(name)
+        self.plot_visited(nodelist, animation)
+        self.plot_path(path)
+
+    # def animation_global(self, nodelist, paths, title, save_filename='anim.gif'):
+    #     self.plot_grid(title)
+
+    #     script_dir = os.path.dirname(os.path.realpath(__file__))
+    #     save_path = os.path.join(script_dir, save_filename)
+        
+    #     fig, ax = plt.subplots()
+    #     ims = []
+        
+    #     for path in paths:
+    #         # for nodes in nodelist:
+    #         #     for node in nodes:
+    #         #         if node.parent:
+    #         #             plt.plot([node.parent.x, node.x], [node.parent.y, node.y], color='white')
+            
+    #         # Plot the sub-path
+    #         x_values, y_values = zip(*path)
+    #         im, = ax.plot(x_values, y_values, color='green', linewidth=1.5)
+    #         ims.append([im])
+
+    #         # plt.plot(x_values, y_values, color='green', linewidth=1.5)
+    #         # plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
+    #         # plt.pause(1)
+        
+    #     ani = animation.ArtistAnimation(fig, ims, interval=100, blit=True)
+    #     ani.save(save_path, writer='imagemagick')
+    #     plt.ioff()
+    #     plt.show()
+
+    def animation_global(self, nodelist, paths, title):
+        fig, ax = plt.subplots()
+
+        for (ox, oy, w, h) in self.obs_bound:
+            ax.add_patch(
+                patches.Rectangle(
+                    (ox, oy), w, h,
+                    edgecolor='black',
+                    facecolor='black',
+                    fill=True
+                )
+            )
+
+        for (ox, oy, w, h) in self.obs_rectangle:
+            ax.add_patch(
+                patches.Rectangle(
+                    (ox, oy), w, h,
+                    edgecolor='black',
+                    facecolor='gray',
+                    fill=True
+                )
+            )
+
+        for (ox, oy, r) in self.obs_circle:
+            ax.add_patch(
+                patches.Circle(
+                    (ox, oy), r,
+                    edgecolor='black',
+                    facecolor='gray',
+                    fill=True
+                )
+            )
+
+        for (ox, oy, w, h) in self.goal_rectangle:
+            ax.add_patch(
+                patches.Rectangle(
+                    (ox, oy), w, h,
+                    edgecolor='black',
+                    facecolor='royalblue',
+                    fill=True
+                )
+            )
+
+        plt.title(title)
+        plt.axis("equal")
+
+        for path in paths:
+            # for nodes in nodelist:
+            #     for node in nodes:
+            #         if node.parent:
+            #             plt.plot([node.parent.x, node.x], [node.parent.y, node.y], color='white')
+            
+            # Plot the sub-path
+            x_values, y_values = zip(*path)
+            ax.plot(x_values, y_values, color='green', linewidth=2)
+            plt.gcf().canvas.mpl_connect('key_release_event', lambda event: [exit(0) if event.key == 'escape' else None])
+            # plt.pause(10)
+            # plt.draw()
+            # plt.clf()
+
+        # plt.ioff()
+        plt.show()
+    
+    # def gif_animate(self,nodelist, paths, title):
+    #     fig, ax = plt.subplots()
+
+    #     ani = FuncAnimation(fig, self.animation_global(nodelist, paths, title), frames = 60, interval = 500, repeat=False)
+    #     plt.show()
+    #     plt.close()
+
+    def animation_connect(self, V1, V2, path, name):
+        self.plot_grid(name)
+        self.plot_visited_connect(V1, V2)
+        self.plot_path(path)
+        
+    def plot_grid(self, name):
+        fig, ax = plt.subplots()
+
+        for (ox, oy, w, h) in self.obs_bound:
+            ax.add_patch(
+                patches.Rectangle(
+                    (ox, oy), w, h,
+                    edgecolor='black',
+                    facecolor='black',
+                    fill=True
+                )
+            )
+
+        for (ox, oy, w, h) in self.obs_rectangle:
+            ax.add_patch(
+                patches.Rectangle(
+                    (ox, oy), w, h,
+                    edgecolor='black',
+                    facecolor='gray',
+                    fill=True
+                )
+            )
+
+        for (ox, oy, r) in self.obs_circle:
+            ax.add_patch(
+                patches.Circle(
+                    (ox, oy), r,
+                    edgecolor='black',
+                    facecolor='gray',
+                    fill=True
+                )
+            )
+
+        for (ox, oy, w, h) in self.goal_rectangle:
+            ax.add_patch(
+                patches.Rectangle(
+                    (ox, oy), w, h,
+                    edgecolor='black',
+                    facecolor='royalblue',
+                    fill=True
+                )
+            )
+
+        # Plots the start location
+        # plt.plot(self.xI[0], self.xI[1], "or", linewidth=5)
+
+        # Plots goal locations
+        # plt.plot(self.xG[0], self.xG[1], "gs", linewidth=3)
+
+        plt.title(name)
+        plt.axis("equal")
+
+    @staticmethod
+    def plot_visited(nodelist, animation):
+        if animation:
+            count = 0
+            for node in nodelist:
+                count += 1
+                if node.parent:
+                    plt.plot([node.parent.x, node.x], [node.parent.y, node.y], color='green')
+                    plt.gcf().canvas.mpl_connect('key_release_event',
+                                                 lambda event:
+                                                 [exit(0) if event.key == 'escape' else None])
+                    if count % 10 == 0:
+                        plt.pause(0.001)
+        else:
+            for node in nodelist:
+                if node.parent:
+                    plt.plot([node.parent.x, node.x], [node.parent.y, node.y], color='green')
+
+    @staticmethod
+    def plot_visited_connect(V1, V2):
+        len1, len2 = len(V1), len(V2)
+
+        for k in range(max(len1, len2)):
+            if k < len1:
+                if V1[k].parent:
+                    plt.plot([V1[k].x, V1[k].parent.x], [V1[k].y, V1[k].parent.y], color='green')
+            if k < len2:
+                if V2[k].parent:
+                    plt.plot([V2[k].x, V2[k].parent.x], [V2[k].y, V2[k].parent.y], color='green')
+
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                                         lambda event: [exit(0) if event.key == 'escape' else None])
+
+            if k % 2 == 0:
+                plt.pause(0.001)
+
+        plt.pause(0.01)
+
+    @staticmethod
+    def plot_path(path):
+        if len(path) != 0:
+            plt.plot([x[0] for x in path], [x[1] for x in path], '-r', linewidth=2)
+            plt.pause(0.01)
+        plt.show()
+    
+
